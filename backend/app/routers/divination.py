@@ -160,3 +160,79 @@ async def test_endpoint():
     )
     return test_result
 
+
+@router.post("/bazi/ai", summary="八字AI解读")
+async def get_bazi_ai_interpretation(request: BaziRequest):
+    """
+    八字AI深度解读
+    
+    重新计算命盘并调用AI进行详细分析
+    """
+    from app.services.gemini_service import generate_bazi_ai_interpretation
+    
+    try:
+        # 1. 重新生成排盘数据
+        chart_data = generate_bazi_chart(
+            year=request.birth_year,
+            month=request.birth_month,
+            day=request.birth_day,
+            hour=request.birth_hour,
+            minute=request.birth_minute,
+            longitude=request.longitude,
+            latitude=request.latitude,
+            gender=request.gender,
+            use_true_solar_time=request.use_true_solar_time
+        )
+        
+        # 2. 调用AI服务
+        result = await generate_bazi_ai_interpretation(chart_data)
+        
+        if not result["success"]:
+            raise HTTPException(status_code=500, detail=result["error"])
+            
+        return {
+            "success": True,
+            "content": result["content"]
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"AI解盘错误: {str(e)}")
+
+@router.post("/bazi/analyze-year", summary="流年运势分析")
+async def analyze_bazi_year(request: BaziRequest, year: int):
+    """
+    分析指定流年的运势
+    """
+    from app.services.gemini_service import generate_bazi_year_analysis
+    
+    try:
+        # 1. 生成排盘
+        chart_data = generate_bazi_chart(
+            year=request.birth_year,
+            month=request.birth_month,
+            day=request.birth_day,
+            hour=request.birth_hour,
+            minute=request.birth_minute,
+            longitude=request.longitude,
+            latitude=request.latitude,
+            gender=request.gender,
+            use_true_solar_time=request.use_true_solar_time
+        )
+        
+        # 2. 调用AI
+        result = await generate_bazi_year_analysis(chart_data, year)
+        
+        if not result["success"]:
+            raise HTTPException(status_code=500, detail=result["error"])
+            
+        return {
+            "success": True,
+            "content": result["content"]
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"流年分析错误: {str(e)}")

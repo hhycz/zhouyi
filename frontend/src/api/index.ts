@@ -19,6 +19,24 @@ export const api = {
     },
 
     /**
+     * 八字 AI 解读
+     */
+    async getBaziAIInterpretation(request: BaziRequest) {
+        const response = await axios.post(`${API_BASE}/divination/bazi/ai`, request);
+        return response.data;
+    },
+
+    /**
+     * 八字流年分析
+     */
+    async analyzeBaziYear(request: BaziRequest, year: number): Promise<{ success: boolean; content: string }> {
+        const response = await axios.post(`${API_BASE}/divination/bazi/analyze-year`, request, {
+            params: { year }
+        });
+        return response.data;
+    },
+
+    /**
      * 六爻起卦
      */
     async getLiuyaoChart(question: string, coinResults: number[]) {

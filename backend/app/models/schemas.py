@@ -54,6 +54,15 @@ class DayMaster(BaseModel):
     yinyang: str
 
 
+class LiuNian(BaseModel):
+    """流年信息"""
+    year: int
+    age: int
+    gan_zhi: str
+    ten_god: str
+    events: List[str] = [] # 流年吉凶神煞/冲合 (e.g. "日支冲", "桃花")
+
+
 class LuckCycle(BaseModel):
     """大运信息"""
     index: int
@@ -62,6 +71,7 @@ class LuckCycle(BaseModel):
     start_year: int
     end_year: int
     gan_zhi: str
+    years: List[LiuNian] = []
 
 
 class BirthInfo(BaseModel):
@@ -90,11 +100,46 @@ class AdditionalInfo(BaseModel):
     next_jieqi: Optional[str]
 
 
+class AnalysisDetail(BaseModel):
+    """分析详情"""
+    score: float
+    level: str
+    level_desc: str
+    details: List[str]
+    day_element: str
+
+
+class UsefulGods(BaseModel):
+    """喜用神"""
+    xi_shen: List[str]
+    yong_shen: Optional[str]
+    ji_shen: List[str]
+    xian_shen: List[str]
+
+
+class PatternInfo(BaseModel):
+    """格局信息"""
+    name: str
+    type: str
+    revealed: bool
+    desc: str
+
+
+class PatternAnalysis(BaseModel):
+    """格局分析"""
+    main_pattern: Optional[PatternInfo]
+    all_patterns: List[PatternInfo]
+    strength_level: str
+
+
 class BaziResponse(BaseModel):
     """八字排盘响应"""
     birth_info: BirthInfo
     chart: ChartInfo
     luck_cycles: List[LuckCycle]
+    strength_analysis: Optional[AnalysisDetail]
+    useful_gods: Optional[UsefulGods]
+    pattern_analysis: Optional[PatternAnalysis]
     additional_info: AdditionalInfo
 
 

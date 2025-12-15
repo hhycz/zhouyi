@@ -11,7 +11,6 @@ import BaziChart from '../results/BaziChart.vue';
 import LiuyaoChart from '../results/LiuyaoChart.vue';
 import { api } from '@/api';
 import type { ChatMessage, DivinationState, BaziRequest, IntentType } from '@/types';
-import axios from 'axios';
 
 const messages = ref<ChatMessage[]>([]);
 const messagesContainer = ref<HTMLElement | null>(null);
@@ -171,15 +170,12 @@ async function handleCoinTossComplete(results: number[]) {
   isLoading.value = true;
   
   try {
-    const response = await axios.post('http://localhost:8000/api/divination/liuyao', {
-      question: state.value.liuyaoQuestion,
-      coin_results: results
-    });
+    const result = await api.getLiuyaoChart(state.value.liuyaoQuestion, results);
     
-    state.value.liuyaoResult = response.data;
+    state.value.liuyaoResult = result;
     
     setTimeout(() => {
-      addSystemMessage('卦象已成，请看：', 'liuyao-chart', response.data);
+      addSystemMessage('卦象已成，请看：', 'liuyao-chart', result);
     }, 1000);
     
   } catch (error) {
@@ -256,13 +252,13 @@ onMounted(() => {
           :class="msg.role"
         >
           <!-- 文本消息 -->
-          <MessageBubble v-if="!msg.widget" :role="msg.role">
+          <MessageBubble v-if="!msg.widget" :role="msg.role as 'system' | 'user'">
             <TypeWriter :text="msg.content" :delay="30" />
           </MessageBubble>
           
           <!-- 带Widget的消息 -->
           <div v-else class="widget-message">
-            <MessageBubble :role="msg.role">
+            <MessageBubble :role="msg.role as 'system' | 'user'">
               <TypeWriter :text="msg.content" :delay="30" />
             </MessageBubble>
             

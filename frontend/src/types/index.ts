@@ -59,6 +59,14 @@ export interface ChartInfo {
     elements_count: Record<string, number>;
 }
 
+export interface LiuNian {
+    year: number;
+    age: number;
+    gan_zhi: string;
+    ten_god: string;
+    events: string[];
+}
+
 export interface LuckCycle {
     index: number;
     start_age: number;
@@ -66,6 +74,7 @@ export interface LuckCycle {
     start_year: number;
     end_year: number;
     gan_zhi: string;
+    years: LiuNian[];
 }
 
 export interface AdditionalInfo {
@@ -75,10 +84,43 @@ export interface AdditionalInfo {
     next_jieqi: string | null;
 }
 
+export interface AnalysisDetail {
+    score: number;
+    level: string;
+    level_desc: string;
+    details: string[];
+    day_element: string;
+}
+
+export interface UsefulGods {
+    xi_shen: string[];
+    yong_shen: string | null;
+    ji_shen: string[];
+    xian_shen: string[];
+    tiao_hou?: string;
+    tong_guan?: string;
+}
+
+export interface PatternInfo {
+    name: string;
+    type: string;
+    revealed: boolean;
+    desc: string;
+}
+
+export interface PatternAnalysis {
+    main_pattern: PatternInfo | null;
+    all_patterns: PatternInfo[];
+    strength_level: string;
+}
+
 export interface BaziResponse {
     birth_info: BirthInfo;
     chart: ChartInfo;
     luck_cycles: LuckCycle[];
+    strength_analysis: AnalysisDetail;
+    useful_gods: UsefulGods;
+    pattern_analysis: PatternAnalysis;
     additional_info: AdditionalInfo;
 }
 

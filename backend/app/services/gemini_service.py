@@ -156,7 +156,84 @@ def _build_interpretation_prompt(
     return "\n".join(parts)
 
 
-# 同步版本（用于不支持异步的场景）
+
+async def generate_bazi_year_analysis(chart_data: Dict, target_year: int) -> Dict[str, Any]:
+    """
+    生成指定流年的命理分析
+    """
+    if not init_gemini():
+        return {
+            "success": False,
+            "error": "Gemini API key not configured",
+            "content": None
+        }
+        
+    # 提取关键信息构建Prompt
+    day_master = chart_data['chart']['day_master']['gan']
+    pattern = chart_data['pattern_analysis']['main_pattern']['name']
+    strong_weak = chart_data['strength_analysis']['level']
+    useful_gods = chart_data['useful_gods']['yong_shen']
+    xi_shen = chart_data['useful_gods']['xi_shen']
+    
+    # 找到该流年的信息
+    year_info = None
+    luck_cycle = None
+    
+    for cycle in chart_data.get('luck_cycles', []):
+        if cycle['start_year'] <= target_year <= cycle['end_year']:
+            luck_cycle = cycle
+            for y in cycle.get('years', []):
+                if y['year'] == target_year:
+                    year_info = y
+                    break
+            break
+            
+    if not year_info:
+        return {"success": False, "error": f"找不到{target_year}年的流年数据", "content": None}
+
+    prompt = f"""
+    请根据以下八字命盘，详细分析【{target_year}年 ({year_info['gan_zhi']})】的流年运势。
+
+    【命主信息】
+    日主：{day_master} ({strong_weak})
+    格局：{pattern}
+    喜用神：{useful_gods} (喜: {', '.join(xi_shen)})
+
+    【当前大运】
+    {luck_cycle['gan_zhi']}大运 ({luck_cycle['start_year']}~{luck_cycle['end_year']})
+
+    【流年信息】
+    年份：{target_year} ({year_info['gan_zhi']})
+    流年十神：{year_info['ten_god']}
+    流年神煞/事件：{', '.join(year_info.get('events', []))}
+
+    【分析要求】
+    1. **吉凶判断**：结合流年干支、大运、原局的冲合关系（如{', '.join(year_info.get('events', []))})，综合判断今年总体运势得分(0-100)及吉凶。
+    2. **重点领域**：分析事业、财运、感情、健康中哪一方面最受影响。
+    3. **关键事件**：根据十神和冲合，预测可能发生的具体事情（如："七杀攻身，注意小人"或"财星合我，进财之象"）。
+    4. **趋吉避凶**：给出这一件具体的行动建议。
+
+    请保持语气专业、客观，既指出风险也给出希望。
+    """
+
+    try:
+        model = genai.GenerativeModel(model_name="gemma-3-1b-it")
+        full_prompt = INTERPRETATION_SYSTEM_PROMPT + "\n\n" + prompt
+        response = await model.generate_content_async(full_prompt)
+        
+        return {
+            "success": True,
+            "error": None,
+            "content": response.text
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e),
+            "content": None
+        }
+
+# Previous sync function...
 def generate_ai_interpretation_sync(
     question: str,
     hexagram_name: str,

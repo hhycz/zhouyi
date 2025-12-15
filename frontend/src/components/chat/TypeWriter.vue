@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 
 const props = withDefaults(defineProps<{
   text: string;
@@ -28,7 +28,7 @@ onMounted(() => {
 <template>
   <span class="typewriter">
     {{ displayedText }}
-    <span v-if="!isComplete" class="cursor">|</span>
+    <span v-if="!isComplete" class="cursor"></span>
   </span>
 </template>
 
@@ -38,12 +38,19 @@ onMounted(() => {
 }
 
 .cursor {
-  animation: blink 1s step-end infinite;
-  color: var(--accent-gold);
+  display: inline-block;
+  width: 0.5em;
+  height: 1em;
+  background-color: var(--accent-gold);
+  vertical-align: text-bottom;
+  animation: blink 0.8s step-end infinite;
+  opacity: 0.8;
+  margin-left: 2px;
+  box-shadow: 0 0 5px var(--accent-gold);
 }
 
 @keyframes blink {
-  0%, 100% { opacity: 1; }
+  0%, 100% { opacity: 0.8; }
   50% { opacity: 0; }
 }
 </style>
