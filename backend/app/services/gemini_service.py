@@ -191,8 +191,23 @@ async def generate_bazi_year_analysis(chart_data: Dict, target_year: int) -> Dic
     if not year_info:
         return {"success": False, "error": f"找不到{target_year}年的流年数据", "content": None}
 
+    # 提取流年干支的详细信息
+    ln_gan = year_info['gan_zhi'][0]
+    ln_zhi = year_info['gan_zhi'][1]
+    
+    # 地支对应的五行和生肖
+    ZHI_WUXING = {'子': '水', '丑': '土', '寅': '木', '卯': '木', '辰': '土', '巳': '火',
+                  '午': '火', '未': '土', '申': '金', '酉': '金', '戌': '土', '亥': '水'}
+    ZHI_SHENGXIAO = {'子': '鼠', '丑': '牛', '寅': '虎', '卯': '兔', '辰': '龙', '巳': '蛇',
+                    '午': '马', '未': '羊', '申': '猴', '酉': '鸡', '戌': '狗', '亥': '猪'}
+    
+    ln_zhi_wx = ZHI_WUXING.get(ln_zhi, '')
+    ln_shengxiao = ZHI_SHENGXIAO.get(ln_zhi, '')
+
     prompt = f"""
-    请根据以下八字命盘，详细分析【{target_year}年 ({year_info['gan_zhi']})】的流年运势。
+    请根据以下八字命盘，详细分析【{target_year}年】的流年运势。
+
+    ⚠️ 重要：本年流年干支为【{year_info['gan_zhi']}】（{ln_shengxiao}年，{ln_zhi}{ln_zhi_wx}），请严格按照此信息分析，不要使用其他干支！
 
     【命主信息】
     日主：{day_master} ({strong_weak})
@@ -202,18 +217,20 @@ async def generate_bazi_year_analysis(chart_data: Dict, target_year: int) -> Dic
     【当前大运】
     {luck_cycle['gan_zhi']}大运 ({luck_cycle['start_year']}~{luck_cycle['end_year']})
 
-    【流年信息】
-    年份：{target_year} ({year_info['gan_zhi']})
+    【{target_year}年流年信息】
+    干支：{year_info['gan_zhi']}（{ln_gan}{ln_zhi}，{ln_shengxiao}年）
+    流年天干：{ln_gan}
+    流年地支：{ln_zhi}（{ln_zhi_wx}）
     流年十神：{year_info['ten_god']}
-    流年神煞/事件：{', '.join(year_info.get('events', []))}
+    流年神煞/事件：{', '.join(year_info.get('events', [])) if year_info.get('events') else '无特殊冲合'}
 
     【分析要求】
-    1. **吉凶判断**：结合流年干支、大运、原局的冲合关系（如{', '.join(year_info.get('events', []))})，综合判断今年总体运势得分(0-100)及吉凶。
+    1. **吉凶判断**：结合{year_info['gan_zhi']}流年干支与命局的关系，综合判断运势得分(0-100)。
     2. **重点领域**：分析事业、财运、感情、健康中哪一方面最受影响。
-    3. **关键事件**：根据十神和冲合，预测可能发生的具体事情（如："七杀攻身，注意小人"或"财星合我，进财之象"）。
-    4. **趋吉避凶**：给出这一件具体的行动建议。
+    3. **关键事件**：根据流年十神（{year_info['ten_god']}）预测可能发生的事情。
+    4. **趋吉避凶**：给出具体的行动建议。
 
-    请保持语气专业、客观，既指出风险也给出希望。
+    请保持语气专业、客观，使用正确的流年干支【{year_info['gan_zhi']}】进行分析。
     """
 
     try:
