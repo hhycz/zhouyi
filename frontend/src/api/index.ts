@@ -4,7 +4,9 @@
 import axios from 'axios';
 import type { BaziRequest, BaziResponse } from '@/types';
 
-const API_BASE = 'http://localhost:8000/api';
+// 动态获取后端地址，支持局域网访问
+const API_HOST = window.location.hostname;
+const API_BASE = `http://${API_HOST}:8000/api`;
 
 export const api = {
     /**
