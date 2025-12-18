@@ -98,3 +98,28 @@ cd frontend && npm run dev
 1. Gemini API使用 `gemma-3-1b-it` 模型（无配额限制）
 2. 卦辞数据在 `backend/app/data/hexagram_texts.json`
 3. 前端API调用基础URL为 `http://localhost:8000/api`
+
+## GitHub 同步规范
+
+> ⚠️ **重要**: 每次更新代码时必须同步更新此备忘录！
+
+### 仓库地址
+- GitHub: https://github.com/hhycz/zhouyi
+
+### 同步要求
+1. **代码变更时**: 同步更新本文档的相关章节
+2. **功能完成时**: 更新 "已完成功能" 列表，将 `[ ]` 改为 `[x]`
+3. **新增待办时**: 在 "待开发功能" 列表添加新项目
+4. **卦辞更新时**: 记录已完成的卦辞数量
+5. **配置变更时**: 更新 "配置信息" 相关内容
+
+### 提交规范
+```bash
+# 更新代码时务必包含备忘录
+git add .agent/PROJECT_CONTEXT.md
+git commit -m "docs: 更新项目上下文备忘录"
+git push origin main
+```
+
+### 更新日期
+每次更新备忘录时，同步更新文档顶部的 "最后更新" 日期。
