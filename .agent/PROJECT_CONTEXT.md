@@ -79,7 +79,7 @@ zhouyi-divination/
 ### 环境变量
 ```bash
 # backend/.env
-GEMINI_API_KEY=AIzaSyAH_anhJqXh90eZNe1BcFkvZ2vIFJAJb_o
+GEMINI_API_KEY=
 ```
 
 ## 启动命令
